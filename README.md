@@ -57,12 +57,6 @@ superteam-aidp/
 | Backend | FastAPI, Python 3.11+ |
 | AIDP | GPU Compute Network |
 
-## Bounty
-
-- **Prize**: $350 USDC (Best Compute Usage)
-- **Deadline**: January 16, 2026
-- **Requirements**: [docs/bounty.md](docs/bounty.md)
-
 ## Links
 
 - [AIDP Store](https://aidp.store)
