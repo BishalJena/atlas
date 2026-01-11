@@ -2,6 +2,7 @@
 
 import { Activity, Menu, X } from 'lucide-react';
 import { useState } from 'react';
+import ConnectWalletButton from './ConnectWalletButton';
 
 export default function Header() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -12,12 +13,12 @@ export default function Header() {
 
                 {/* Brand */}
                 <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-[var(--accent-primary)] flex items-center justify-center shadow-lg shadow-blue-500/20">
+                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-emerald-500/20">
                         <Activity className="w-5 h-5 text-white" />
                     </div>
                     <div>
                         <h1 className="font-semibold text-[var(--text-primary)] text-lg leading-tight">
-                            AIDP <span className="text-[var(--text-secondary)] font-normal">Arena</span>
+                            Atlas <span className="text-[var(--text-secondary)] font-normal">by AIDP</span>
                         </h1>
                     </div>
                 </div>
@@ -30,18 +31,21 @@ export default function Header() {
                     </div>
                     <div className="h-4 w-px bg-[var(--border-default)]"></div>
                     <div className="text-[var(--text-secondary)]">
-                        <span className="text-[var(--text-primary)] font-mono font-medium">5</span> Nodes Active
+                        <span className="text-[var(--text-primary)] font-mono font-medium">4</span> Nodes Active
                     </div>
                 </div>
 
                 {/* Desktop Actions */}
                 <div className="hidden md:flex items-center gap-3">
-                    <button className="btn-secondary text-sm">
+                    <a
+                        href="https://aidp.store"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn-secondary text-sm"
+                    >
                         Docs
-                    </button>
-                    <button className="btn-primary text-sm">
-                        Connect Wallet
-                    </button>
+                    </a>
+                    <ConnectWalletButton />
                 </div>
 
                 {/* Mobile Menu Toggle */}
@@ -64,13 +68,27 @@ export default function Header() {
                         </div>
                     </div>
 
-                    <button className="w-full btn-primary py-3">
-                        Connect Wallet
-                    </button>
+                    <div className="flex justify-center">
+                        <ConnectWalletButton />
+                    </div>
 
                     <div className="flex gap-2">
-                        <button className="flex-1 btn-secondary py-2 text-sm">Docs</button>
-                        <button className="flex-1 btn-secondary py-2 text-sm">Support</button>
+                        <a
+                            href="https://aidp.store"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex-1 btn-secondary py-2 text-sm text-center"
+                        >
+                            Docs
+                        </a>
+                        <a
+                            href="https://t.me/Aidpofficial"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex-1 btn-secondary py-2 text-sm text-center"
+                        >
+                            Support
+                        </a>
                     </div>
                 </div>
             )}
