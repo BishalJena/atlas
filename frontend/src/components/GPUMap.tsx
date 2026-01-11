@@ -7,6 +7,7 @@ import {
     Geography,
     Marker,
     ZoomableGroup,
+    Graticule,
 } from 'react-simple-maps';
 import { GPUNode } from '@/types';
 
@@ -20,7 +21,7 @@ interface GPUMapProps {
 
 export default function GPUMap({ nodes, selectedNode, onSelectNode }: GPUMapProps) {
     const [hoveredNode, setHoveredNode] = useState<string | null>(null);
-    const [position, setPosition] = useState({ coordinates: [0, 20] as [number, number], zoom: 1 });
+    const [position, setPosition] = useState({ coordinates: [0, 0] as [number, number], zoom: 1 });
 
     const handleMoveEnd = (pos: { coordinates: [number, number]; zoom: number }) => {
         setPosition(pos);
@@ -55,10 +56,13 @@ export default function GPUMap({ nodes, selectedNode, onSelectNode }: GPUMapProp
                 </button>
             </div>
 
-            {/* World Map with Zoom & Pan */}
+            {/* World Map - Robinson Projection with Graticule */}
             <ComposableMap
-                projection="geoMercator"
-                projectionConfig={{ scale: 140 }}
+                projection="geoEqualEarth"
+                projectionConfig={{
+                    scale: 140,
+                    center: [0, 0],
+                }}
                 className="w-full h-full"
                 style={{ backgroundColor: 'transparent' }}
             >
@@ -69,6 +73,9 @@ export default function GPUMap({ nodes, selectedNode, onSelectNode }: GPUMapProp
                     minZoom={1}
                     maxZoom={8}
                 >
+                    {/* Graticule (grid lines) */}
+                    <Graticule stroke="rgba(100, 116, 139, 0.15)" strokeWidth={0.5} />
+
                     {/* Countries */}
                     <Geographies geography={geoUrl}>
                         {({ geographies }) =>
@@ -76,12 +83,19 @@ export default function GPUMap({ nodes, selectedNode, onSelectNode }: GPUMapProp
                                 <Geography
                                     key={geo.rsmKey}
                                     geography={geo}
-                                    fill="#1e293b"
-                                    stroke="#334155"
+                                    fill="#0ea5e9"
+                                    stroke="#0284c7"
                                     strokeWidth={0.5}
                                     style={{
-                                        default: { outline: 'none' },
-                                        hover: { outline: 'none', fill: '#334155' },
+                                        default: {
+                                            outline: 'none',
+                                            opacity: 0.7,
+                                        },
+                                        hover: {
+                                            outline: 'none',
+                                            opacity: 0.9,
+                                            fill: '#38bdf8',
+                                        },
                                         pressed: { outline: 'none' },
                                     }}
                                 />
@@ -107,36 +121,36 @@ export default function GPUMap({ nodes, selectedNode, onSelectNode }: GPUMapProp
                                     {/* Pulse animation for online nodes */}
                                     {isOnline && (
                                         <circle
-                                            r={isSelected ? 16 : 12}
-                                            fill={isSelected ? 'rgba(16, 185, 129, 0.3)' : 'rgba(16, 185, 129, 0.15)'}
+                                            r={isSelected ? 18 : 14}
+                                            fill={isSelected ? 'rgba(16, 185, 129, 0.4)' : 'rgba(16, 185, 129, 0.2)'}
                                             className="animate-pulse"
                                         />
                                     )}
 
-                                    {/* Main marker */}
+                                    {/* Outer ring */}
                                     <circle
-                                        r={isSelected ? 8 : isHovered ? 7 : 6}
-                                        fill={isOnline ? '#10b981' : '#f59e0b'}
-                                        stroke={isSelected ? '#ffffff' : 'rgba(255,255,255,0.5)'}
-                                        strokeWidth={isSelected ? 2.5 : 1.5}
+                                        r={isSelected ? 10 : isHovered ? 9 : 8}
+                                        fill="rgba(0, 0, 0, 0.6)"
+                                        stroke={isOnline ? '#10b981' : '#f59e0b'}
+                                        strokeWidth={2}
                                     />
 
-                                    {/* GPU icon (inner circle) */}
+                                    {/* Inner dot */}
                                     <circle
-                                        r={2.5}
-                                        fill={isSelected ? '#ffffff' : 'rgba(255,255,255,0.8)'}
+                                        r={isSelected ? 5 : 4}
+                                        fill={isOnline ? '#10b981' : '#f59e0b'}
                                     />
 
                                     {/* Node label */}
                                     <text
                                         textAnchor="middle"
-                                        y={-14}
+                                        y={-16}
                                         style={{
-                                            fontSize: '10px',
-                                            fontWeight: isSelected ? 600 : 500,
-                                            fill: isSelected ? '#10b981' : '#94a3b8',
+                                            fontSize: '11px',
+                                            fontWeight: isSelected ? 700 : 600,
+                                            fill: '#ffffff',
                                             fontFamily: 'system-ui, sans-serif',
-                                            textShadow: '0 1px 2px rgba(0,0,0,0.8)',
+                                            textShadow: '0 1px 3px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.8)',
                                         }}
                                     >
                                         {node.location.city}
@@ -146,12 +160,13 @@ export default function GPUMap({ nodes, selectedNode, onSelectNode }: GPUMapProp
                                     {(isHovered || isSelected) && (
                                         <text
                                             textAnchor="middle"
-                                            y={20}
+                                            y={24}
                                             style={{
-                                                fontSize: '8px',
+                                                fontSize: '9px',
                                                 fontWeight: 500,
-                                                fill: '#64748b',
+                                                fill: '#94a3b8',
                                                 fontFamily: 'system-ui, sans-serif',
+                                                textShadow: '0 1px 3px rgba(0,0,0,0.9)',
                                             }}
                                         >
                                             {node.gpu.model}
