@@ -56,18 +56,16 @@ export default function GPUMap({ nodes, selectedNode, onSelectNode }: GPUMapProp
                             <Geography
                                 key={geo.rsmKey}
                                 geography={geo}
-                                fill="#0ea5e9"
-                                stroke="#0284c7"
-                                strokeWidth={0.5}
+                                fill="#0c4a6e"
+                                stroke="#38bdf8"
+                                strokeWidth={0.8}
                                 style={{
                                     default: {
                                         outline: 'none',
-                                        opacity: 0.7,
                                     },
                                     hover: {
                                         outline: 'none',
-                                        opacity: 0.9,
-                                        fill: '#38bdf8',
+                                        fill: '#0369a1',
                                     },
                                     pressed: { outline: 'none' },
                                 }}
