@@ -67,6 +67,7 @@ out/
 
 # Vercel
 .vercel
+docs
 
 # ===================
 # Environment Files
