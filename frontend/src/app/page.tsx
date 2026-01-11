@@ -9,6 +9,7 @@ import MetricsPanel from '@/components/MetricsPanel';
 import PromptInput from '@/components/PromptInput';
 import OutputDisplay from '@/components/OutputDisplay';
 import SessionStatsPanel from '@/components/SessionStats';
+import CostComparison from '@/components/CostComparison';
 import Footer from '@/components/Footer';
 import { mockNodes, workloadTypes, llmResponses, samplePrompts } from '@/lib/mockData';
 import { GPUNode, WorkloadType, ComputeJob, SessionStats } from '@/types';
@@ -218,6 +219,11 @@ export default function Home() {
                             />
                         </div>
                     </div>
+                </div>
+
+                {/* Cost Comparison Section */}
+                <div className="mt-8">
+                    <CostComparison />
                 </div>
             </main>
             <Footer />
