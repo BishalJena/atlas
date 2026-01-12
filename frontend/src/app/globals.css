@@ -6,44 +6,44 @@
 }
 
 /* 
- * AIDP Premium Design System
- * Minimal, high-contrast, professional.
+ * AIDP Cyberpunk Design System
+ * Deep void backgrounds, neon accents, glassmorphism.
  */
 :root {
-  /* Backgrounds */
-  --bg-primary: #050505;
-  /* Deepest black */
-  --bg-secondary: #0A0A0A;
-  /* Section background */
-  --bg-tertiary: #121212;
-  /* Card background */
-  --bg-elevated: #171717;
-  /* Hover states, elevated cards */
+  /* Backgrounds - Deep Void Palette */
+  --bg-primary: #020617;
+  /* Slate-950: Main background */
+  --bg-secondary: #0f172a;
+  /* Slate-900: Secondary sections */
+  --bg-tertiary: #1e293b;
+  /* Slate-800: Cards/Containers */
+  --bg-elevated: #334155;
+  /* Slate-700: Hover states */
 
   /* Text */
-  --text-primary: #EDEDED;
-  /* High emphasis */
-  --text-secondary: #A1A1AA;
-  /* Medium emphasis */
-  --text-tertiary: #52525B;
-  /* Low emphasis */
-  --text-brand: #3B82F6;
-  /* Brand text color */
+  --text-primary: #f8fafc;
+  /* Slate-50 */
+  --text-secondary: #94a3b8;
+  /* Slate-400 */
+  --text-tertiary: #64748b;
+  /* Slate-500 */
 
   /* Borders */
-  --border-subtle: #1F1F1F;
-  --border-default: #27272A;
-  --border-strong: #3F3F46;
+  --border-subtle: rgba(148, 163, 184, 0.1);
+  --border-default: rgba(148, 163, 184, 0.2);
+  --border-strong: rgba(148, 163, 184, 0.3);
 
-  /* Brand Accent - Electric Blue */
-  --accent-primary: #3B82F6;
-  --accent-hover: #2563EB;
-  --accent-dim: rgba(59, 130, 246, 0.1);
+  /* Accents - Neon Cyan & Emerald */
+  --accent-primary: #06b6d4;
+  /* Cyan-500 */
+  --accent-secondary: #10b981;
+  /* Emerald-500 */
+  --accent-glow: rgba(6, 182, 212, 0.5);
 
-  /* Status Colors */
-  --status-success: #10B981;
-  --status-warning: #F59E0B;
-  --status-error: #EF4444;
+  /* Status */
+  --status-success: #10b981;
+  --status-warning: #f59e0b;
+  --status-error: #ef4444;
 
   /* Animations */
   --ease-out: cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -54,92 +54,113 @@ body {
   color: var(--text-primary);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  background-image:
+    radial-gradient(circle at 50% 0%, rgba(6, 182, 212, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 100% 0%, rgba(16, 185, 129, 0.1) 0%, transparent 30%);
+  min-height: 100vh;
 }
 
 /* 
- * Premium Card 
- * Clean border, subtle background, no glassmorphism
+ * Glassmorphism Components 
  */
-.premium-card {
-  background-color: var(--bg-tertiary);
+.glass-panel {
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--border-subtle);
-  border-radius: 12px;
-  transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.premium-card {
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-subtle);
+  @apply rounded-xl transition-all duration-300;
 }
 
 .premium-card:hover {
-  border-color: var(--border-default);
-  background-color: var(--bg-elevated);
-}
-
-/* 
- * Interactive Element 
- * For clickable list items, nodes, etc.
- */
-.interactive-item {
-  position: relative;
-  overflow: hidden;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  border: 1px solid transparent;
-  transition: all 0.15s ease-out;
-}
-
-.interactive-item:hover {
-  background-color: var(--bg-elevated);
-  border-color: var(--border-subtle);
-}
-
-.interactive-item.active {
-  background-color: var(--accent-dim);
   border-color: var(--accent-primary);
+  box-shadow: 0 0 20px rgba(6, 182, 212, 0.1);
+  transform: translateY(-1px);
 }
 
 /* 
- * Primary Button 
- * Subtle gradient, clean shadow
+ * Buttons 
  */
 .btn-primary {
-  background: linear-gradient(180deg, #3B82F6 0%, #2563EB 100%);
-  color: white;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.2) 0%, rgba(6, 182, 212, 0.1) 100%);
+  border: 1px solid rgba(6, 182, 212, 0.5);
+  color: #22d3ee;
+  box-shadow: 0 0 10px rgba(6, 182, 212, 0.1);
   font-weight: 500;
   border-radius: 0.5rem;
   padding: 0.5rem 1rem;
-  transition: transform 0.1s;
-}
-
-.btn-primary:active {
-  transform: scale(0.95);
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.75rem;
 }
 
 .btn-primary:hover {
-  filter: brightness(1.1);
+  background: rgba(6, 182, 212, 0.25);
+  box-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
+  text-shadow: 0 0 8px rgba(34, 211, 238, 0.5);
+  border-color: #22d3ee;
 }
 
-/* 
- * Secondary Button
- * Outline style
- */
 .btn-secondary {
-  background-color: transparent;
+  background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--border-default);
   color: var(--text-secondary);
   font-weight: 500;
   border-radius: 0.5rem;
   padding: 0.5rem 1rem;
   transition: all 0.2s;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .btn-secondary:hover {
-  border-color: var(--text-secondary);
+  border-color: var(--text-primary);
   color: var(--text-primary);
-  background-color: var(--bg-elevated);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 /* 
- * Map Marker 
- * Pulsing effect for online nodes
+ * Typography Utilities 
+ */
+.text-label {
+  @apply text-xs font-mono uppercase tracking-wider text-[var(--text-secondary)];
+}
+
+.text-value {
+  @apply font-mono text-[var(--accent-primary)];
+}
+
+/* 
+ * Scrollbar 
+ */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--bg-elevated);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
+/* 
+ * Animations 
  */
 .marker-pulse {
   animation: marker-pulse 2s infinite;
@@ -159,30 +180,10 @@ body {
   }
 }
 
-/* 
- * Utilities
- */
-.text-brand {
-  color: var(--accent-primary);
-}
-
-.hide-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-
-.hide-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-/* Loading Shimmer */
 .shimmer {
-  background: linear-gradient(90deg,
-      var(--bg-tertiary) 0%,
-      var(--bg-elevated) 50%,
-      var(--bg-tertiary) 100%);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
   background-size: 200% 100%;
-  animation: shimmer 1.5s infinite linear;
+  animation: shimmer 2s infinite linear;
 }
 
 @keyframes shimmer {

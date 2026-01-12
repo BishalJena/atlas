@@ -119,102 +119,54 @@ export default function Home() {
     }, [selectedNode, selectedWorkload]);
 
     return (
-        <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] font-sans">
+        <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] font-sans selection:bg-[var(--accent-primary)] selection:text-white">
             <Header />
 
-            <main className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24">
+            <main className="max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24 space-y-6">
 
-                {/* Top Section: Dashboard Header */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-                    <div>
-                        <h1 className="text-2xl font-semibold mb-1">Compute Dashboard</h1>
-                        <p className="text-[var(--text-secondary)] text-sm">Orchestrate GPU workloads across the decentralized network</p>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                        <SessionStatsPanel stats={sessionStats} />
-                    </div>
-                </div>
-
-                {/* Main Grid Layout */}
-                <div className="grid grid-cols-12 gap-6 min-h-[700px]">
-
-                    {/* Left Column: Primary Visualization (6 cols) */}
-                    <div className="col-span-12 lg:col-span-6 flex flex-col gap-6 h-full overflow-hidden">
-                        {/* Map */}
-                        <GPUMap
-                            nodes={mockNodes}
-                            selectedNode={selectedNode}
-                            onSelectNode={handleNodeSelect}
-                        />
-
-                        {/* Cost Comparison - Dynamic based on selected node */}
-                        <CostComparison selectedNode={selectedNode} />
-
-                        {/* Workload Section */}
-                        <div className="premium-card flex-1 p-6 flex flex-col gap-4 overflow-hidden">
-                            {/* Row 1: Input Field + Workload Buttons (same line) */}
-                            <div className="flex flex-col lg:flex-row gap-4">
-                                {/* Input Field (takes most space) */}
-                                <div className="flex-1 min-w-0">
-                                    <PromptInput
-                                        workload={selectedWorkload}
-                                        onSubmit={handlePromptSubmit}
-                                        isLoading={isRunning}
-                                        disabled={!selectedNode || !selectedWorkload}
-                                        prompt={promptText}
-                                        setPrompt={setPromptText}
-                                    />
-                                </div>
-
-                                {/* Workload Buttons (right side) */}
-                                <div className="flex-shrink-0">
-                                    <WorkloadPicker
-                                        workloads={workloadTypes}
-                                        selectedWorkload={selectedWorkload}
-                                        onSelectWorkload={handleWorkloadSelect}
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Row 2: Sample Prompts (FULL WIDTH, spread evenly) */}
-                            {selectedWorkload && (
-                                <div className="flex flex-row gap-3 overflow-hidden">
-                                    {(samplePrompts[selectedWorkload.id as keyof typeof samplePrompts] || []).slice(0, 3).map((sample: string, i: number) => (
-                                        <button
-                                            key={i}
-                                            onClick={() => setPromptText(sample)}
-                                            className="flex-1 min-w-0 text-xs text-[var(--text-secondary)] bg-[var(--bg-tertiary)] border border-[var(--border-subtle)] px-3 py-2 rounded-lg hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)] hover:border-[var(--border-default)] transition-all flex items-center justify-center gap-1.5 text-center overflow-hidden"
-                                        >
-                                            <span className="truncate">{sample}</span>
-                                        </button>
-                                    ))}
-                                </div>
-                            )}
-
-                            {/* Row 3: Output Section (full width, scrollable) */}
-                            <div className="flex-1 min-h-[150px] overflow-hidden">
-                                <OutputDisplay
-                                    job={currentJob}
-                                    isRunning={isRunning}
-                                />
+                {/* Tier 1: Infrastructure (The "Where") */}
+                <div className="grid grid-cols-12 gap-6 h-[600px]">
+                    {/* Node Explorer (Left - 3 cols) */}
+                    <div className="col-span-12 lg:col-span-3 h-full overflow-hidden flex flex-col glass-panel rounded-2xl p-1">
+                        <div className="p-4 pb-2 border-b border-[var(--border-subtle)] mb-2">
+                            <div className="text-label flex items-center gap-2">
+                                <div className="w-1.5 h-1.5 rounded-full bg-[var(--accent-primary)] shadow-[0_0_10px_var(--accent-primary)]"></div>
+                                Node Explorer
                             </div>
                         </div>
-                    </div>
-
-                    {/* Right Column: Controls & telemetry (6 cols) */}
-                    <div className="col-span-12 lg:col-span-6 flex flex-col gap-6 h-full">
-                        {/* Node List - Fixed height */}
-                        <div className="h-[400px]">
+                        <div className="flex-1 overflow-hidden">
                             <NodeSelector
                                 nodes={mockNodes}
                                 selectedNode={selectedNode}
                                 onSelectNode={handleNodeSelect}
                             />
                         </div>
+                    </div>
 
-                        {/* Telemetry - Fills remaining space */}
-                        <div className="flex-1 min-h-[300px]">
+                    {/* Global Map (Right - 9 cols) */}
+                    <div className="col-span-12 lg:col-span-9 h-full glass-panel rounded-2xl overflow-hidden relative group">
+                        <div className="absolute top-4 left-4 z-10 text-label bg-black/50 backdrop-blur-md px-3 py-1 rounded-full border border-white/5">
+                            Global Compute Network
+                        </div>
+                        <GPUMap
+                            nodes={mockNodes}
+                            selectedNode={selectedNode}
+                            onSelectNode={handleNodeSelect}
+                        />
+                        {/* Subtle vignette overlay */}
+                        <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_50%,rgba(2,6,23,0.6)_100%)]"></div>
+                    </div>
+                </div>
+
+                {/* Tier 2: Intelligence (The "Why") */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-[320px]">
+                    {/* Telemetry */}
+                    <div className="glass-panel rounded-2xl p-6 flex flex-col relative overflow-hidden">
+                        <div className="text-label mb-4 flex justify-between items-center">
+                            <span>Live Telemetry</span>
+                            {selectedNode && <span className="text-[var(--accent-primary)]">{selectedNode.name}</span>}
+                        </div>
+                        <div className="flex-1">
                             <MetricsPanel
                                 node={selectedNode}
                                 currentJob={currentJob}
@@ -222,7 +174,57 @@ export default function Home() {
                             />
                         </div>
                     </div>
+
+                    {/* Cost Analysis */}
+                    <div className="glass-panel rounded-2xl flex flex-col overflow-hidden">
+                        <div className="p-4 pb-2 border-b border-[var(--border-subtle)]">
+                            <div className="text-label">Cost Analysis</div>
+                        </div>
+                        <div className="flex-1 overflow-y-auto">
+                            <CostComparison selectedNode={selectedNode} />
+                        </div>
+                    </div>
                 </div>
+
+                {/* Tier 3: Operations (The "What") */}
+                <div className="glass-panel rounded-2xl overflow-hidden flex flex-col">
+                    {/* Header */}
+                    <div className="px-5 py-3 border-b border-[var(--border-subtle)] bg-gradient-to-r from-[var(--bg-secondary)] to-transparent flex items-center justify-between">
+                        <div className="text-label flex items-center gap-2">
+                            <div className="w-2 h-2 rounded-full bg-[var(--accent-secondary)] shadow-[0_0_8px_var(--accent-secondary)]"></div>
+                            Workload Studio
+                        </div>
+                        <WorkloadPicker
+                            workloads={workloadTypes}
+                            selectedWorkload={selectedWorkload}
+                            onSelectWorkload={handleWorkloadSelect}
+                        />
+                    </div>
+
+                    {/* Content */}
+                    <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 min-h-[350px]">
+                        {/* Input Area */}
+                        <div className="p-5 border-b lg:border-b-0 lg:border-r border-[var(--border-subtle)]">
+                            <PromptInput
+                                workload={selectedWorkload}
+                                onSubmit={handlePromptSubmit}
+                                isLoading={isRunning}
+                                disabled={!selectedNode || !selectedWorkload}
+                                prompt={promptText}
+                                setPrompt={setPromptText}
+                            />
+                        </div>
+
+                        {/* Output Console */}
+                        <div className="min-h-[300px]">
+                            <OutputDisplay
+                                job={currentJob}
+                                isRunning={isRunning}
+                            />
+                        </div>
+                    </div>
+                </div>
+
             </main>
             <Footer />
         </div>

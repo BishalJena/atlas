@@ -22,32 +22,30 @@ export default function GPUMap({ nodes, selectedNode, onSelectNode }: GPUMapProp
     const [hoveredNode, setHoveredNode] = useState<string | null>(null);
 
     return (
-        <div className="premium-card h-[400px] lg:h-[450px] relative overflow-hidden" style={{ background: 'linear-gradient(180deg, #020617 0%, #0f172a 100%)' }}>
+        <div className="h-full w-full relative">
             {/* Header - Live Network Badge */}
-            <div className="absolute top-3 left-3 z-20">
-                <div className="flex items-center gap-2 bg-slate-900/80 backdrop-blur-sm border border-slate-700/50 px-2.5 py-1 rounded-full">
+            <div className="absolute top-4 right-4 z-20">
+                <div className="flex items-center gap-2 bg-black/40 backdrop-blur-md border border-white/10 px-3 py-1.5 rounded-full">
                     <span className="relative flex h-2 w-2">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--accent-secondary)] opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-[var(--accent-secondary)]"></span>
                     </span>
-                    <span className="text-[10px] font-medium text-slate-300">LIVE NETWORK</span>
+                    <span className="text-[10px] font-medium text-[var(--text-secondary)] tracking-wider">LIVE MAINNET</span>
                 </div>
             </div>
 
-            {/* World Map - Equal Earth Projection with Graticule (Static) */}
+            {/* World Map - Equal Earth Projection */}
             <ComposableMap
                 projection="geoEqualEarth"
                 projectionConfig={{
                     scale: 180,
                     center: [10, 5],
                 }}
-                width={800}
-                height={400}
                 className="w-full h-full"
                 style={{ backgroundColor: 'transparent' }}
             >
                 {/* Graticule (grid lines) */}
-                <Graticule stroke="rgba(100, 116, 139, 0.15)" strokeWidth={0.5} />
+                <Graticule stroke="rgba(255, 255, 255, 0.03)" strokeWidth={0.5} />
 
                 {/* Countries */}
                 <Geographies geography={geoUrl}>
@@ -56,17 +54,12 @@ export default function GPUMap({ nodes, selectedNode, onSelectNode }: GPUMapProp
                             <Geography
                                 key={geo.rsmKey}
                                 geography={geo}
-                                fill="#0c4a6e"
-                                stroke="#38bdf8"
-                                strokeWidth={0.8}
+                                fill="rgba(30, 41, 59, 0.4)"
+                                stroke="rgba(148, 163, 184, 0.1)"
+                                strokeWidth={0.5}
                                 style={{
-                                    default: {
-                                        outline: 'none',
-                                    },
-                                    hover: {
-                                        outline: 'none',
-                                        fill: '#0369a1',
-                                    },
+                                    default: { outline: 'none' },
+                                    hover: { outline: 'none', fill: 'rgba(59, 130, 246, 0.2)', stroke: 'rgba(59, 130, 246, 0.4)' },
                                     pressed: { outline: 'none' },
                                 }}
                             />
@@ -92,57 +85,41 @@ export default function GPUMap({ nodes, selectedNode, onSelectNode }: GPUMapProp
                                 {/* Pulse animation for online nodes */}
                                 {isOnline && (
                                     <circle
-                                        r={isSelected ? 18 : 14}
-                                        fill={isSelected ? 'rgba(16, 185, 129, 0.4)' : 'rgba(16, 185, 129, 0.2)'}
-                                        className="animate-pulse"
+                                        r={isSelected ? 20 : 12}
+                                        fill={isSelected ? 'rgba(6, 182, 212, 0.1)' : 'rgba(16, 185, 129, 0.05)'}
+                                        className={isSelected ? "animate-ping opacity-20" : "animate-pulse"}
                                     />
                                 )}
 
-                                {/* Outer ring */}
+                                {/* Marker Circle */}
                                 <circle
-                                    r={isSelected ? 10 : isHovered ? 9 : 8}
-                                    fill="rgba(0, 0, 0, 0.6)"
-                                    stroke={isOnline ? '#10b981' : '#f59e0b'}
-                                    strokeWidth={2}
+                                    r={isSelected ? 8 : isHovered ? 6 : 4}
+                                    fill={isSelected ? 'var(--accent-primary)' : isOnline ? 'var(--status-success)' : 'var(--status-warning)'}
+                                    stroke={isSelected ? 'white' : 'transparent'}
+                                    strokeWidth={1}
+                                    className="transition-all duration-300"
                                 />
 
-                                {/* Inner dot */}
-                                <circle
-                                    r={isSelected ? 5 : 4}
-                                    fill={isOnline ? '#10b981' : '#f59e0b'}
-                                />
+                                {/* Connection Line Effect (if selected) */}
+                                {isSelected && (
+                                    <circle r={40} fill="none" stroke="var(--accent-primary)" strokeWidth={0.5} opacity={0.2} className="animate-spin-slow" />
+                                )}
 
-                                {/* Node label */}
+                                {/* Label */}
                                 <text
                                     textAnchor="middle"
-                                    y={-16}
+                                    y={-14}
                                     style={{
-                                        fontSize: '11px',
-                                        fontWeight: isSelected ? 700 : 600,
-                                        fill: '#ffffff',
-                                        fontFamily: 'system-ui, sans-serif',
-                                        textShadow: '0 1px 3px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.8)',
+                                        fontSize: '10px',
+                                        fontWeight: isSelected ? 700 : 500,
+                                        fill: isSelected ? 'white' : 'rgba(255,255,255,0.7)',
+                                        opacity: isSelected || isHovered ? 1 : 0,
+                                        transition: 'opacity 0.2s',
+                                        pointerEvents: 'none'
                                     }}
                                 >
                                     {node.location.city}
                                 </text>
-
-                                {/* GPU Model label (on hover/select) */}
-                                {(isHovered || isSelected) && (
-                                    <text
-                                        textAnchor="middle"
-                                        y={24}
-                                        style={{
-                                            fontSize: '9px',
-                                            fontWeight: 500,
-                                            fill: '#94a3b8',
-                                            fontFamily: 'system-ui, sans-serif',
-                                            textShadow: '0 1px 3px rgba(0,0,0,0.9)',
-                                        }}
-                                    >
-                                        {node.gpu.model}
-                                    </text>
-                                )}
                             </g>
                         </Marker>
                     );
@@ -150,20 +127,15 @@ export default function GPUMap({ nodes, selectedNode, onSelectNode }: GPUMapProp
             </ComposableMap>
 
             {/* Bottom Legend */}
-            <div className="absolute bottom-3 left-3 z-20 flex items-center gap-4">
-                <div className="flex items-center gap-1.5 text-[10px] text-slate-400">
-                    <div className="w-2.5 h-2.5 rounded-full bg-emerald-500"></div>
-                    <span>{nodes.filter(n => n.status === 'online').length} online</span>
+            <div className="absolute bottom-4 left-6 z-20 flex flex-col gap-1 text-[10px] text-[var(--text-tertiary)]">
+                <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-[var(--status-success)]"></div>
+                    <span>{nodes.filter(n => n.status === 'online').length} Nodes Online</span>
                 </div>
-                <div className="flex items-center gap-1.5 text-[10px] text-slate-400">
-                    <div className="w-2.5 h-2.5 rounded-full bg-amber-500"></div>
-                    <span>{nodes.filter(n => n.status !== 'online').length} busy</span>
+                <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-[var(--accent-primary)]"></div>
+                    <span>High Performance</span>
                 </div>
-            </div>
-
-            {/* Click hint */}
-            <div className="absolute bottom-3 right-3 z-20 text-[9px] text-slate-500">
-                click node to select
             </div>
         </div>
     );

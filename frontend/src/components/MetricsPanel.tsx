@@ -47,9 +47,9 @@ export default function MetricsPanel({ node, currentJob, isRunning }: MetricsPan
 
     if (!node) {
         return (
-            <div className="premium-card p-8 h-full flex flex-col items-center justify-center text-[var(--text-tertiary)] border-dashed">
-                <Activity className="w-12 h-12 mb-4 opacity-20" />
-                <p className="text-sm font-medium">Select a node to view telemetry</p>
+            <div className="h-full flex flex-col items-center justify-center text-[var(--text-tertiary)] opacity-60">
+                <Activity className="w-10 h-10 mb-2" />
+                <p className="text-xs">No active telemetry feed</p>
             </div>
         );
     }
@@ -82,8 +82,8 @@ export default function MetricsPanel({ node, currentJob, isRunning }: MetricsPan
             value: `${node.latency}ms`,
             subValue: "Global Network",
             icon: <Wifi className="w-4 h-4" />,
-            color: node.latency < 50 ? "text-green-400" : "text-yellow-400",
-            barColor: node.latency < 50 ? "bg-green-500" : "bg-yellow-500",
+            color: node.latency < 50 ? "text-[var(--status-success)]" : "text-[var(--status-warning)]",
+            barColor: node.latency < 50 ? "bg-[var(--status-success)]" : "bg-[var(--status-warning)]",
             percentage: Math.min(100, (node.latency / 200) * 100)
         },
         {
@@ -91,52 +91,40 @@ export default function MetricsPanel({ node, currentJob, isRunning }: MetricsPan
             value: `${node.metrics.temperature}°C`,
             subValue: "Optimal Range",
             icon: <Thermometer className="w-4 h-4" />,
-            color: node.metrics.temperature < 70 ? "text-green-400" : "text-orange-400",
-            barColor: node.metrics.temperature < 70 ? "bg-green-500" : "bg-orange-500",
+            color: node.metrics.temperature < 70 ? "text-[var(--status-success)]" : "text-[var(--status-warning)]",
+            barColor: node.metrics.temperature < 70 ? "bg-[var(--status-success)]" : "bg-[var(--status-warning)]",
             percentage: node.metrics.temperature
         }
     ];
 
     return (
-        <div className="premium-card p-5 h-full flex flex-col">
-            <div className="flex items-center justify-between mb-6">
-                <h3 className="text-sm font-semibold text-[var(--text-secondary)] uppercase tracking-wider">
-                    Telemetry
-                </h3>
-                {isRunning && (
-                    <div className="flex items-center gap-2 bg-[var(--bg-primary)] border border-[var(--border-subtle)] px-2 py-1 rounded text-xs text-green-400 font-mono">
-                        <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                        LIVE
-                    </div>
-                )}
-            </div>
-
-            <div className="grid grid-cols-1 gap-4 mb-6">
+        <div className="flex flex-col h-full">
+            <div className="grid grid-cols-2 gap-4 mb-6">
                 {/* Primary Inference Metric */}
-                <div className="bg-[var(--bg-secondary)] border border-[var(--border-subtle)] p-4 rounded-lg">
-                    <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs text-[var(--text-secondary)]">Inference Time</span>
+                <div className="bg-[var(--bg-secondary)] border border-[var(--border-subtle)] p-4 rounded-lg relative overflow-hidden group hover:border-[var(--accent-primary)] transition-colors">
+                    <div className="flex items-center justify-between mb-1 relative z-10">
+                        <span className="text-xs text-[var(--text-secondary)]">Time</span>
                         <Clock className="w-3 h-3 text-[var(--text-tertiary)]" />
                     </div>
-                    <div className="text-2xl font-mono font-medium text-[var(--text-primary)]">
+                    <div className="text-xl font-mono font-medium text-[var(--text-primary)] relative z-10">
                         {formatTime(currentJob?.metrics.inferenceTime || elapsedTime)}
                     </div>
-                    {isRunning && <div className="h-0.5 w-full bg-green-500 shimmer mt-2 rounded-full" />}
+                    {isRunning && <div className="absolute inset-0 bg-[var(--accent-primary)]/5 shimmer" />}
                 </div>
 
                 {/* Cost Metric */}
-                <div className="bg-[var(--bg-secondary)] border border-[var(--border-subtle)] p-4 rounded-lg">
+                <div className="bg-[var(--bg-secondary)] border border-[var(--border-subtle)] p-4 rounded-lg group hover:border-[var(--accent-primary)] transition-colors">
                     <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs text-[var(--text-secondary)]">Estimated Cost</span>
+                        <span className="text-xs text-[var(--text-secondary)]">Cost</span>
                         <DollarSign className="w-3 h-3 text-[var(--text-tertiary)]" />
                     </div>
-                    <div className="text-2xl font-mono font-medium text-[var(--text-primary)]">
+                    <div className="text-xl font-mono font-medium text-[var(--text-primary)]">
                         ${estimateCost().toFixed(5)}
                     </div>
                 </div>
             </div>
 
-            <div className="space-y-4 flex-1">
+            <div className="space-y-5 flex-1 p-2">
                 {metrics.map((m, i) => (
                     <div key={i} className="space-y-1.5">
                         <div className="flex items-center justify-between text-xs">
@@ -146,14 +134,11 @@ export default function MetricsPanel({ node, currentJob, isRunning }: MetricsPan
                             </div>
                             <span className={`font-mono ${m.color}`}>{m.value}</span>
                         </div>
-                        <div className="h-1.5 bg-[var(--bg-primary)] rounded-full overflow-hidden border border-[var(--border-subtle)]">
+                        <div className="h-1 bg-[var(--bg-tertiary)] rounded-full overflow-hidden">
                             <div
                                 className={`h-full rounded-full transition-all duration-300 ${m.barColor}`}
                                 style={{ width: `${m.percentage}%` }}
                             />
-                        </div>
-                        <div className="text-[10px] text-right text-[var(--text-tertiary)]">
-                            {m.subValue}
                         </div>
                     </div>
                 ))}

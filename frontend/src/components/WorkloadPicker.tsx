@@ -1,7 +1,7 @@
 'use client';
 
 import { WorkloadType } from '@/types';
-import { MessageSquare, Image as ImageIcon, Video } from 'lucide-react';
+import { MessageSquare, Image as ImageIcon, Video, Sparkles } from 'lucide-react';
 
 interface WorkloadPickerProps {
     workloads: WorkloadType[];
@@ -12,56 +12,44 @@ interface WorkloadPickerProps {
 export default function WorkloadPicker({ workloads, selectedWorkload, onSelectWorkload }: WorkloadPickerProps) {
     const getIcon = (id: string) => {
         switch (id) {
-            case 'llm': return <MessageSquare className="w-4 h-4" />;
-            case 'image': return <ImageIcon className="w-4 h-4" />;
-            case 'video': return <Video className="w-4 h-4" />;
-            default: return <MessageSquare className="w-4 h-4" />;
+            case 'llm': return <MessageSquare className="w-3.5 h-3.5" />;
+            case 'image': return <ImageIcon className="w-3.5 h-3.5" />;
+            case 'video': return <Video className="w-3.5 h-3.5" />;
+            default: return <Sparkles className="w-3.5 h-3.5" />;
         }
     };
 
-    const getShortName = (id: string) => {
+    const getLabel = (id: string) => {
         switch (id) {
             case 'llm': return 'LLM';
-            case 'image': return 'Image';
-            case 'video': return 'Video';
-            default: return id;
+            case 'image': return 'IMG';
+            case 'video': return 'VID';
+            default: return id.toUpperCase();
         }
     };
 
     return (
-        <div className="flex flex-col">
-            {/* WORKLOAD header to match INPUT and OUTPUT headers */}
-            <h2 className="text-[var(--text-secondary)] text-xs font-semibold uppercase tracking-wider mb-2">
-                Workload
-            </h2>
-            <div className="flex gap-2">
-                {workloads.map((workload) => {
-                    const isSelected = selectedWorkload?.id === workload.id;
+        <div className="flex items-center gap-1 p-1 rounded-lg bg-[var(--bg-tertiary)] border border-[var(--border-subtle)]">
+            {workloads.map((workload) => {
+                const isSelected = selectedWorkload?.id === workload.id;
 
-                    return (
-                        <button
-                            key={workload.id}
-                            onClick={() => onSelectWorkload(workload)}
-                            className={`
-                            flex flex-col items-center justify-center gap-1 px-4 py-4 rounded-xl
-                            border transition-all duration-200 min-w-[80px] h-[72px]
+                return (
+                    <button
+                        key={workload.id}
+                        onClick={() => onSelectWorkload(workload)}
+                        className={`
+                            relative flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-200
                             ${isSelected
-                                    ? 'bg-[var(--accent-primary)] border-[var(--accent-primary)] text-white shadow-lg shadow-blue-500/20'
-                                    : 'bg-[var(--bg-tertiary)] border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--bg-elevated)] hover:border-[var(--border-default)] hover:text-[var(--text-primary)]'
-                                }
+                                ? 'bg-[var(--accent-primary)] text-white shadow-lg shadow-[var(--accent-primary)]/30'
+                                : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)]'
+                            }
                         `}
-                        >
-                            <div className="flex items-center gap-1.5">
-                                {getIcon(workload.id)}
-                                <span className="text-xs font-semibold">{getShortName(workload.id)}</span>
-                            </div>
-                            <span className={`text-[10px] font-mono ${isSelected ? 'text-blue-200' : 'text-[var(--text-muted)]'}`}>
-                                ${workload.avgCost}/req
-                            </span>
-                        </button>
-                    );
-                })}
-            </div>
+                    >
+                        {getIcon(workload.id)}
+                        <span>{getLabel(workload.id)}</span>
+                    </button>
+                );
+            })}
         </div>
     );
 }
