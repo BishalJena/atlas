@@ -83,3 +83,16 @@ export interface NetworkStats {
     jobsProcessed24h: number;
     uptimePercent: number;
 }
+
+export interface CloudProvider {
+    instance: string;
+    hourly: number;
+    inference: number;
+}
+
+export interface CloudPricing {
+    aws: CloudProvider;
+    gcp: CloudProvider;
+    azure: CloudProvider;
+}
+

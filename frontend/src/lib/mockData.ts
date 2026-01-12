@@ -236,3 +236,28 @@ export const networkStats = {
     jobsProcessed24h: 1247,
     uptimePercent: 99.7,
 };
+
+// Cloud provider pricing for comparison (rates as of Jan 2026)
+// Based on on-demand pricing, us-east region equivalents
+export const cloudPricing: Record<string, {
+    aws: { instance: string; hourly: number; inference: number };
+    gcp: { instance: string; hourly: number; inference: number };
+    azure: { instance: string; hourly: number; inference: number };
+}> = {
+    'NVIDIA RTX 4090': {
+        aws: { instance: 'g5.xlarge', hourly: 1.01, inference: 0.006 },
+        gcp: { instance: 'g2-standard-4', hourly: 0.94, inference: 0.0055 },
+        azure: { instance: 'NV36ads_A10_v5', hourly: 0.90, inference: 0.0058 },
+    },
+    'NVIDIA A100': {
+        aws: { instance: 'p4d.24xlarge', hourly: 3.67, inference: 0.015 },
+        gcp: { instance: 'a2-highgpu-1g', hourly: 3.19, inference: 0.013 },
+        azure: { instance: 'NC24ads_A100_v4', hourly: 3.06, inference: 0.012 },
+    },
+    'NVIDIA H100': {
+        aws: { instance: 'p5.48xlarge', hourly: 8.77, inference: 0.035 },
+        gcp: { instance: 'a3-highgpu-1g', hourly: 8.00, inference: 0.032 },
+        azure: { instance: 'ND96isr_H100_v5', hourly: 7.50, inference: 0.030 },
+    },
+};
+

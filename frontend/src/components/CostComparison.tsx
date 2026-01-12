@@ -1,81 +1,102 @@
 'use client';
 
-import { useState } from 'react';
-import { TrendingDown, Zap, Server, DollarSign } from 'lucide-react';
+import { TrendingDown, DollarSign, Cpu, MapPin } from 'lucide-react';
+import { GPUNode } from '@/types';
+import { cloudPricing } from '@/lib/mockData';
 
-interface PricingData {
+interface CostComparisonProps {
+    selectedNode: GPUNode | null;
+}
+
+interface ProviderCost {
     provider: string;
     logo: string;
     color: string;
+    instance: string;
     hourlyRate: number;
-    inferenceRate: number; // per 1K tokens
-    setupFee: number;
+    monthlyRate: number;
 }
 
-const pricingData: PricingData[] = [
-    {
-        provider: 'AIDP',
-        logo: '⚡',
-        color: '#10b981',
-        hourlyRate: 0.14,
-        inferenceRate: 0.0012,
-        setupFee: 0,
-    },
-    {
-        provider: 'AWS',
-        logo: '☁️',
-        color: '#ff9900',
-        hourlyRate: 0.85,
-        inferenceRate: 0.006,
-        setupFee: 0,
-    },
-    {
-        provider: 'GCP',
-        logo: '🌐',
-        color: '#4285f4',
-        hourlyRate: 0.92,
-        inferenceRate: 0.0065,
-        setupFee: 0,
-    },
-    {
-        provider: 'Azure',
-        logo: '☁️',
-        color: '#0078d4',
-        hourlyRate: 0.90,
-        inferenceRate: 0.007,
-        setupFee: 0,
-    },
-];
+export default function CostComparison({ selectedNode }: CostComparisonProps) {
+    // If no node selected, show placeholder
+    if (!selectedNode) {
+        return (
+            <div className="premium-card p-6">
+                <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 flex items-center justify-center">
+                        <TrendingDown className="w-5 h-5 text-emerald-400" />
+                    </div>
+                    <div>
+                        <h3 className="text-lg font-semibold text-white">Cost Comparison</h3>
+                        <p className="text-xs text-slate-400">AIDP vs Traditional Cloud</p>
+                    </div>
+                </div>
+                <div className="flex items-center justify-center h-32 bg-slate-800/30 rounded-xl border border-dashed border-slate-700">
+                    <div className="text-center">
+                        <Cpu className="w-8 h-8 text-slate-600 mx-auto mb-2" />
+                        <p className="text-sm text-slate-500">Select a node to compare costs</p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
-interface WorkloadPreset {
-    name: string;
-    icon: string;
-    hours: number;
-    inferences: number; // in thousands
-    description: string;
-}
+    // Get cloud pricing for selected GPU type
+    const gpuModel = selectedNode.gpu.model;
+    const cloudRates = cloudPricing[gpuModel];
 
-const workloadPresets: WorkloadPreset[] = [
-    { name: 'Startup', icon: '🚀', hours: 100, inferences: 500, description: '~100 hrs/mo, 500K inferences' },
-    { name: 'Growth', icon: '📈', hours: 500, inferences: 2000, description: '~500 hrs/mo, 2M inferences' },
-    { name: 'Enterprise', icon: '🏢', hours: 2000, inferences: 10000, description: '~2000 hrs/mo, 10M inferences' },
-];
+    // If no cloud rates for this GPU (unlikely), show fallback
+    if (!cloudRates) {
+        return (
+            <div className="premium-card p-6">
+                <p className="text-slate-400">No comparison data for {gpuModel}</p>
+            </div>
+        );
+    }
 
-export default function CostComparison() {
-    const [selectedPreset, setSelectedPreset] = useState<WorkloadPreset>(workloadPresets[1]);
-    const [customHours, setCustomHours] = useState(workloadPresets[1].hours);
-    const [customInferences, setCustomInferences] = useState(workloadPresets[1].inferences);
-    const [isCustom, setIsCustom] = useState(false);
+    // Calculate monthly costs (assuming 730 hours/month for comparison)
+    const hoursPerMonth = 730;
 
-    const hours = isCustom ? customHours : selectedPreset.hours;
-    const inferences = isCustom ? customInferences : selectedPreset.inferences;
+    const providers: ProviderCost[] = [
+        {
+            provider: 'AIDP',
+            logo: '⚡',
+            color: '#10b981',
+            instance: selectedNode.name,
+            hourlyRate: selectedNode.pricing.hourly,
+            monthlyRate: selectedNode.pricing.hourly * hoursPerMonth,
+        },
+        {
+            provider: 'AWS',
+            logo: '☁️',
+            color: '#ff9900',
+            instance: cloudRates.aws.instance,
+            hourlyRate: cloudRates.aws.hourly,
+            monthlyRate: cloudRates.aws.hourly * hoursPerMonth,
+        },
+        {
+            provider: 'GCP',
+            logo: '🌐',
+            color: '#4285f4',
+            instance: cloudRates.gcp.instance,
+            hourlyRate: cloudRates.gcp.hourly,
+            monthlyRate: cloudRates.gcp.hourly * hoursPerMonth,
+        },
+        {
+            provider: 'Azure',
+            logo: '☁️',
+            color: '#0078d4',
+            instance: cloudRates.azure.instance,
+            hourlyRate: cloudRates.azure.hourly,
+            monthlyRate: cloudRates.azure.hourly * hoursPerMonth,
+        },
+    ];
 
-    const calculateCost = (provider: PricingData) => {
-        return (provider.hourlyRate * hours) + (provider.inferenceRate * inferences) + provider.setupFee;
-    };
-
-    const aidpCost = calculateCost(pricingData[0]);
-    const maxCost = Math.max(...pricingData.map(p => calculateCost(p)));
+    const aidpCost = providers[0].monthlyRate;
+    const maxCost = Math.max(...providers.map(p => p.monthlyRate));
+    const maxSavings = Math.max(...providers.slice(1).map(p =>
+        Math.round(((p.monthlyRate - aidpCost) / p.monthlyRate) * 100)
+    ));
 
     const formatCurrency = (value: number) => {
         if (value >= 1000) {
@@ -92,7 +113,7 @@ export default function CostComparison() {
     return (
         <div className="premium-card p-6">
             {/* Header */}
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 flex items-center justify-center">
                         <TrendingDown className="w-5 h-5 text-emerald-400" />
@@ -104,84 +125,34 @@ export default function CostComparison() {
                 </div>
                 <div className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30">
                     <span className="text-xs font-medium text-emerald-400">
-                        Save up to {getSavingsPercent(Math.max(...pricingData.slice(1).map(p => calculateCost(p))))}%
+                        Save up to {maxSavings}%
                     </span>
                 </div>
             </div>
 
-            {/* Workload Presets */}
-            <div className="mb-6">
-                <div className="text-xs text-slate-400 mb-2">Select Workload</div>
-                <div className="flex gap-2">
-                    {workloadPresets.map((preset) => (
-                        <button
-                            key={preset.name}
-                            onClick={() => {
-                                setSelectedPreset(preset);
-                                setIsCustom(false);
-                            }}
-                            className={`flex-1 px-3 py-2.5 rounded-lg border transition-all ${!isCustom && selectedPreset.name === preset.name
-                                    ? 'border-emerald-500/50 bg-emerald-500/10 text-emerald-400'
-                                    : 'border-slate-700 bg-slate-800/50 text-slate-300 hover:border-slate-600'
-                                }`}
-                        >
-                            <div className="text-lg mb-1">{preset.icon}</div>
-                            <div className="text-sm font-medium">{preset.name}</div>
-                            <div className="text-[10px] text-slate-500">{preset.description}</div>
-                        </button>
-                    ))}
+            {/* Selected Node Info */}
+            <div className="mb-4 p-3 rounded-lg bg-slate-800/50 border border-slate-700/50 flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+                    <Cpu className="w-4 h-4 text-emerald-400" />
                 </div>
-            </div>
-
-            {/* Custom Sliders (collapsed by default) */}
-            <div className="mb-6">
-                <button
-                    onClick={() => setIsCustom(!isCustom)}
-                    className="text-xs text-slate-400 hover:text-slate-300 transition-colors mb-2 flex items-center gap-1"
-                >
-                    <Zap className="w-3 h-3" />
-                    {isCustom ? 'Using custom values' : 'Customize values'}
-                </button>
-                {isCustom && (
-                    <div className="space-y-4 p-4 rounded-lg bg-slate-800/30 border border-slate-700/50">
-                        <div>
-                            <div className="flex justify-between text-xs mb-1">
-                                <span className="text-slate-400">GPU Hours/Month</span>
-                                <span className="text-white font-medium">{customHours} hrs</span>
-                            </div>
-                            <input
-                                type="range"
-                                min="10"
-                                max="5000"
-                                value={customHours}
-                                onChange={(e) => setCustomHours(Number(e.target.value))}
-                                className="w-full accent-emerald-500"
-                            />
-                        </div>
-                        <div>
-                            <div className="flex justify-between text-xs mb-1">
-                                <span className="text-slate-400">Inferences (K/month)</span>
-                                <span className="text-white font-medium">{customInferences}K</span>
-                            </div>
-                            <input
-                                type="range"
-                                min="100"
-                                max="50000"
-                                value={customInferences}
-                                onChange={(e) => setCustomInferences(Number(e.target.value))}
-                                className="w-full accent-emerald-500"
-                            />
-                        </div>
+                <div className="flex-1">
+                    <div className="text-sm font-medium text-white">{gpuModel}</div>
+                    <div className="text-xs text-slate-400 flex items-center gap-1">
+                        <MapPin className="w-3 h-3" />
+                        {selectedNode.location.city}, {selectedNode.location.country}
                     </div>
-                )}
+                </div>
+                <div className="text-right">
+                    <div className="text-lg font-bold text-emerald-400">${selectedNode.pricing.hourly}/hr</div>
+                    <div className="text-[10px] text-slate-500">AIDP Rate</div>
+                </div>
             </div>
 
             {/* Cost Bars */}
             <div className="space-y-3">
-                {pricingData.map((provider, index) => {
-                    const cost = calculateCost(provider);
-                    const barWidth = (cost / maxCost) * 100;
-                    const savings = getSavingsPercent(cost);
+                {providers.map((provider) => {
+                    const barWidth = (provider.monthlyRate / maxCost) * 100;
+                    const savings = getSavingsPercent(provider.monthlyRate);
                     const isAIDP = provider.provider === 'AIDP';
 
                     return (
@@ -192,15 +163,18 @@ export default function CostComparison() {
                                     <span className={`text-sm font-medium ${isAIDP ? 'text-emerald-400' : 'text-slate-300'}`}>
                                         {provider.provider}
                                     </span>
+                                    <span className="text-[10px] text-slate-500 hidden sm:inline">
+                                        {provider.instance}
+                                    </span>
                                     {isAIDP && (
                                         <span className="px-1.5 py-0.5 text-[9px] font-bold bg-emerald-500/20 text-emerald-400 rounded">
-                                            YOU SAVE
+                                            BEST VALUE
                                         </span>
                                     )}
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <span className={`text-sm font-bold ${isAIDP ? 'text-emerald-400' : 'text-white'}`}>
-                                        {formatCurrency(cost)}
+                                        {formatCurrency(provider.monthlyRate)}/mo
                                     </span>
                                     {!isAIDP && savings > 0 && (
                                         <span className="text-[10px] text-red-400">
@@ -224,30 +198,30 @@ export default function CostComparison() {
                 })}
             </div>
 
-            {/* Monthly Savings Summary */}
-            <div className="mt-6 p-4 rounded-xl bg-gradient-to-r from-emerald-500/10 to-cyan-500/10 border border-emerald-500/20">
+            {/* Savings Summary */}
+            <div className="mt-4 p-3 rounded-xl bg-gradient-to-r from-emerald-500/10 to-cyan-500/10 border border-emerald-500/20">
                 <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <DollarSign className="w-5 h-5 text-emerald-400" />
+                    <div className="flex items-center gap-2">
+                        <DollarSign className="w-4 h-4 text-emerald-400" />
                         <div>
-                            <div className="text-xs text-slate-400">Monthly Savings vs AWS</div>
-                            <div className="text-xl font-bold text-emerald-400">
-                                {formatCurrency(calculateCost(pricingData[1]) - aidpCost)}/mo
+                            <div className="text-[10px] text-slate-400">Monthly Savings vs AWS</div>
+                            <div className="text-lg font-bold text-emerald-400">
+                                {formatCurrency(providers[1].monthlyRate - aidpCost)}
                             </div>
                         </div>
                     </div>
                     <div className="text-right">
-                        <div className="text-xs text-slate-400">Yearly Savings</div>
-                        <div className="text-lg font-semibold text-white">
-                            {formatCurrency((calculateCost(pricingData[1]) - aidpCost) * 12)}
+                        <div className="text-[10px] text-slate-400">Yearly Savings</div>
+                        <div className="text-sm font-semibold text-white">
+                            {formatCurrency((providers[1].monthlyRate - aidpCost) * 12)}
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* Footer Note */}
-            <div className="mt-4 text-[10px] text-slate-500 text-center">
-                * Pricing based on RTX 4090 equivalent. Actual costs may vary by region and usage.
+            {/* Footer */}
+            <div className="mt-3 text-[9px] text-slate-500 text-center">
+                * Prices as of Jan 2026. Based on on-demand rates, us-east region.
             </div>
         </div>
     );

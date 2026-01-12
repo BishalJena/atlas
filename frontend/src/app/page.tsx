@@ -148,6 +148,9 @@ export default function Home() {
                             onSelectNode={handleNodeSelect}
                         />
 
+                        {/* Cost Comparison - Dynamic based on selected node */}
+                        <CostComparison selectedNode={selectedNode} />
+
                         {/* Workload Section */}
                         <div className="premium-card flex-1 p-6 flex flex-col gap-4 overflow-hidden">
                             {/* Row 1: Input Field + Workload Buttons (same line) */}
@@ -219,11 +222,6 @@ export default function Home() {
                             />
                         </div>
                     </div>
-                </div>
-
-                {/* Cost Comparison Section */}
-                <div className="mt-8">
-                    <CostComparison />
                 </div>
             </main>
             <Footer />
